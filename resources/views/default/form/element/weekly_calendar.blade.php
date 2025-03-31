@@ -8,7 +8,8 @@
     </label>
 
     <div>
-        <input type="hidden" id="{{ $id }}" name="{{ $name }}" {!! $attributes !!} value="{{ $value }}">
+      
+        <input type="hidden" id="{{ $id }}" data-start-hour="{{$startHour}}" data-end-hour="{{$endHour}}"   name="{{ $name }}" {!! $attributes !!} value="{{ $value }}">
         <div id="calendar-container-{{ $id }}" class="weekly-calendar-container"></div>
     </div>
 
@@ -123,7 +124,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const startHour = parseInt(calendarInput.getAttribute('data-start-hour') || 7);
     const endHour = parseInt(calendarInput.getAttribute('data-end-hour') || 15);
     
-    const daysOfWeek = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
+    const daysOfWeek = [
+        "{{ __('sleeping_owl::weekly_calendar.monday') }}",
+        "{{ __('sleeping_owl::weekly_calendar.tuesday') }}",
+        "{{ __('sleeping_owl::weekly_calendar.wednesday') }}",
+        "{{ __('sleeping_owl::weekly_calendar.thursday') }}",
+        "{{ __('sleeping_owl::weekly_calendar.friday') }}",
+        "{{ __('sleeping_owl::weekly_calendar.saturday') }}",
+        "{{ __('sleeping_owl::weekly_calendar.sunday') }}"
+    ];
     let calendarGenerated = false;
     
     // Zmienne do zaznaczania zakresu
@@ -178,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Dodaj pusty narożnik
         const cornerCell = document.createElement('div');
         cornerCell.className = 'weekly-calendar-header';
-        cornerCell.textContent = 'Godz. / Dzień';
+        cornerCell.textContent = '{{__('sleeping_owl::weekly_calendar.zero')}}';
         calendar.appendChild(cornerCell);
         
         // Dodaj nagłówki dni tygodnia
@@ -228,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
         legendColor1.className = 'weekly-calendar-legend-color weekly-calendar-selected-example';
         
         const legendText1 = document.createElement('span');
-        legendText1.textContent = 'Zaznaczone godziny';
+        legendText1.textContent = "{{ __('sleeping_owl::weekly_calendar.selected_hours') }}";
         
         legendItem1.appendChild(legendColor1);
         legendItem1.appendChild(legendText1);
@@ -240,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
         legendColor2.className = 'weekly-calendar-legend-color';
         
         const legendText2 = document.createElement('span');
-        legendText2.textContent = 'Dostępne godziny';
+        legendText2.textContent = "{{ __('sleeping_owl::weekly_calendar.available_hours') }}";
         
         legendItem2.appendChild(legendColor2);
         legendItem2.appendChild(legendText2);

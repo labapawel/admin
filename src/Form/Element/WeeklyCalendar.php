@@ -53,6 +53,12 @@ class WeeklyCalendar extends NamedFormElement
         
         return $this;
     }
+
+    public function save(\Illuminate\Http\Request $request)
+    {
+       // dd(json_decode($this->getValueFromRequest($request), true));
+        $this->setModelAttribute(json_decode($this->getValueFromRequest($request), true));
+    }
     
     /**
      * Pobierz godzinę początkową
@@ -88,11 +94,12 @@ class WeeklyCalendar extends NamedFormElement
      * @return array
      */
     public function toArray()
-    {
-        return parent::toArray() + [
+    { 
+       // dd($this->getValue());
+        return array_merge(parent::toArray(),  [
             'startHour' => $this->getStartHour(),
-            'endHour' => $this->getEndHour(),
-        ];
+            'value' => $this->getValue(),
+            'endHour' => $this->getEndHour()]);
     }
     
     /**
@@ -102,10 +109,11 @@ class WeeklyCalendar extends NamedFormElement
      */
     public function getAttributes()
     {
-        return [
+
+        return array_merge( parent::getAttributes(), [
             'class' => 'form-control weekly-calendar-input',
             'data-start-hour' => $this->getStartHour(),
             'data-end-hour' => $this->getEndHour(),
-        ] + parent::getAttributes();
+        ]);
     }
 }
