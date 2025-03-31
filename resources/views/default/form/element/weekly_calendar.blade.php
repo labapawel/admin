@@ -48,7 +48,7 @@
         position: sticky;
         top: 0;
         z-index: 10;
-        height: 30px;
+        height: 45px;
         line-height: 30px;
         box-sizing: border-box;
     }
