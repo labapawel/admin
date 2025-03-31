@@ -9,6 +9,7 @@
         "crud",
         "panel"
     ],
+    "minimum-stability": "dev",
     "license": "MIT",
     "support": {
         "issues": "https://github.com/LaravelRUS/SleepingOwlAdmin/issues",
