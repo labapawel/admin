@@ -95,10 +95,11 @@ class WeeklyCalendar extends NamedFormElement
      */
     public function toArray()
     { 
-       // dd($this->getValue());
+        $model = $this->resolvePath();
+        // dd($model, $model->{$this->getModelAttributeKey()});
         return array_merge(parent::toArray(),  [
             'startHour' => $this->getStartHour(),
-            'value' => $this->getValue(),
+            'value' => $model->{$this->getModelAttributeKey()},
             'endHour' => $this->getEndHour()]);
     }
     

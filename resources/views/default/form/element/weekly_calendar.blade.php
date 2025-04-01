@@ -86,7 +86,7 @@
         background-color: #eaecf4;
     }
     .weekly-calendar-cell.selected {
-        background-color: #36b9cc;
+        background-color: #5a5c69;
         color: white;
     }
     .weekly-calendar-legend {
