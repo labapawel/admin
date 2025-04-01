@@ -37,13 +37,14 @@
         display: grid;
         grid-template-columns: 60px repeat(7, 1fr);
         border-collapse: collapse;
+        border-radius: 4px;
         min-width: 800px;
     }
     .weekly-calendar-header {
         padding: 5px 0;
         text-align: center;
         font-weight: 600;
-        background-color: #4e73df;
+        background-color: #343a40;
         color: white;
         border: 1px solid #e3e6f0;
         position: sticky;
@@ -69,7 +70,7 @@
         cursor: pointer;
     }
     .weekly-calendar-time.selected {
-        background-color: #36b9cc;
+        background-color: #5a5c69;
         color: white;
     }
     .weekly-calendar-cell {
@@ -109,7 +110,7 @@
         border: 1px solid #e3e6f0;
     }
     .weekly-calendar-selected-example {
-        background-color: #36b9cc;
+        background-color: #5a5c69;
     }
 </style>
 @endpush
