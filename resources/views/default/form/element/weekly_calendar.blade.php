@@ -1,6 +1,6 @@
 <div class="form-group{{ $errors->has($name) ? ' has-error' : '' }}">
     <label for="{{ $id }}" class="control-label">
-        {{ $label }}
+        {{ $label }} <span class="countHours"></span>
 
         @if($required)
             <span class="form-element-required">*</span>
@@ -199,6 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
             calendar.appendChild(dayHeader);
         });
         
+
         // Dodaj wiersze godzin
         for (let hour = startHour; hour <= endHour; hour++) {
             // Dodaj komórkę z godziną
@@ -372,6 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Wczytaj zapisany stan jeśli istnieje
     const savedSelection = loadCalendarState();
+
     if (savedSelection && Array.isArray(savedSelection)) {
         savedSelection.forEach(item => {
             const cell = calendarContainer.querySelector(`.weekly-calendar-cell[data-day="${item.day}"][data-hour="${item.hour}"]`);
@@ -379,6 +381,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 cell.classList.add('selected');
             }
         });
+        document.querySelector('.countHours').value = savedSelection.length;
+
     }
 });
 </script>
