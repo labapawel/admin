@@ -159,6 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Wywołaj zdarzenie zmiany dla triggerowania walidacji formularza
         const event = new Event('change', { bubbles: true });
         calendarInput.dispatchEvent(event);
+        document.querySelector('.countHours').value = `{{__('sleeping_owl::selCount')}}  ${selection.length}`;
     }
     
     // Funkcja do wczytywania stanu kalendarza z inputa
@@ -381,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 cell.classList.add('selected');
             }
         });
-        document.querySelector('.countHours').value = savedSelection.length;
+      
 
     }
 });
