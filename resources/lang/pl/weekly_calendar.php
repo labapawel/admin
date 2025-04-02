@@ -10,5 +10,5 @@ return [
     'sunday' => 'Niedziela',
     'selected_hours' => 'Wybrane godziny',
     'available_hours' => 'Dostępne godziny',
-    'selCount' => 'Wybrano: ',
+    'selCount' => ' - Wybrano: ',
 ];

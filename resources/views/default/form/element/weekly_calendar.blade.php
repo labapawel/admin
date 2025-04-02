@@ -40,6 +40,9 @@
         border-radius: 4px;
         min-width: 800px;
     }
+    .weekly-calendar .countHours {
+        font-weight: normal;
+    }
     .weekly-calendar-header {
         padding: 5px 0;
         text-align: center;
@@ -141,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastSelectedHour = null;
     let isMouseDown = false;
     let isSelecting = true;
+    let selCount = "{{__('sleeping_owl::weekly_calendar.selCount')}}";
     
     // Funkcja do zapisywania stanu kalendarza do inputa
     function saveCalendarState() {
@@ -159,7 +163,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Wywołaj zdarzenie zmiany dla triggerowania walidacji formularza
         const event = new Event('change', { bubbles: true });
         calendarInput.dispatchEvent(event);
-        document.querySelector('.countHours').value = `{{__('sleeping_owl::selCount')}}  ${selection.length}`;
+        // console.log(selection);
+        
+        document.querySelector('.countHours').innerHTML = `${selCount}  ${selection.length}`;
     }
     
     // Funkcja do wczytywania stanu kalendarza z inputa
@@ -167,7 +173,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!calendarInput.value) return false;
         
         try {
-            return JSON.parse(calendarInput.value);
+            const selection = JSON.parse(calendarInput.value);
+            document.querySelector('.countHours').innerHTML = `${selCount}  ${selection.length}`;
+
+            return selection;
         } catch (error) {
             console.error("Błąd podczas wczytywania stanu kalendarza:", error);
         }
