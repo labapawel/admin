@@ -75,6 +75,7 @@ class FormElementFactory extends AliasBinder implements FormElementFactoryInterf
             'password' => Element\Password::class,
             'textarea' => Element\Textarea::class,
             'weeklycalendar' => Element\WeeklyCalendar::class,
+            'daterange' => Element\DateRangePickerField::class,
             'view' => Element\View::class,
             'image' => Element\Image::class,
             'images' => Element\Images::class,
