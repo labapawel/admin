@@ -26,7 +26,9 @@ class DateRangePickerField extends FormElement
      * @var string
      */
     protected $format = 'd.m.Y';
+
     
+    protected $label = "Wybierz daty";
     /**
      * @var string
      */
@@ -120,6 +122,7 @@ class DateRangePickerField extends FormElement
         
         return $this;
     }
+
     
     /**
      * @param string $startLabel
@@ -161,14 +164,14 @@ class DateRangePickerField extends FormElement
      * 
      * @return $this
      */
-    // public function setLabel($startLabel)
-    // {
-    //     $this->label = "dasdasd";
-    //     //$this->setStartLabel($startLabel);
-    //     // $this->setEndLabel($endLabel);
+    public function setLabel($startLabel)
+    {
+        // $this->label = "dasdasd";
+        //$this->setStartLabel($startLabel);
+        // $this->setEndLabel($endLabel);
         
-    //     return $this;
-    // }
+        return $this;
+    }
 
     /**
      * @return string
@@ -236,6 +239,8 @@ class DateRangePickerField extends FormElement
             'startValue' => old($this->getStartField()) ?: $this->getModel()->{$this->getStartField()},
             'endValue'   => old($this->getEndField()) ?: $this->getModel()->{$this->getEndField()},
             'id'         => $this->getStartField().$this->getEndField(),
+            'label'      => $this->label,
+            'required'      => $this->label,
             'holidays'   => json_encode($this->getHolidays()),
             'disablePastDates' => $this->isPastDatesDisabled(),
         ];

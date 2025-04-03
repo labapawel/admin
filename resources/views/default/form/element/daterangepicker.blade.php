@@ -72,7 +72,7 @@
     @endif
 </div>
 
-@section('footer-scripts')
+@push('style')
     @parent
     <style>
         .daterangepicker-container {
@@ -250,7 +250,8 @@
             }
         }
     </style>
-
+@endstylepush
+@push('scripts')
     <script>
         $(function() {
             // Inicjalizacja wszystkich kalendarzy na stronie
@@ -483,4 +484,5 @@
             }
         });
     </script>
-@endsection
+@endpush
+{{-- End of resources/views/admin/form/element/daterangepicker.blade.php --}}
