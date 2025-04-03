@@ -72,8 +72,7 @@
     @endif
 </div>
 
-@push('style')
-    @parent
+@pushonce('style')
     <style>
         .daterangepicker-container {
             margin-bottom: 15px;
@@ -484,5 +483,5 @@
             }
         });
     </script>
-@endpush
+@endpushonce
 {{-- End of resources/views/admin/form/element/daterangepicker.blade.php --}}
