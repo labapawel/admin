@@ -115,4 +115,5 @@ require('./admin/form/related');
 require('./admin/form/password');
 require('./admin/form/text');
 require('./admin/form/daterangepicker');
+require('./admin/form/weekly_calendar');
 

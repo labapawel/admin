@@ -1,4 +1,4 @@
-{{-- resources/views/admin/form/element/daterangepicker.blade.php --}}
+
 <div class="form-group form-element-daterangepicker {{ $errors->has($startField) || $errors->has($endField) ? 'has-error' : '' }}" 
      data-id="{{ $id }}" 
      data-holidays="{{ $holidays }}" 

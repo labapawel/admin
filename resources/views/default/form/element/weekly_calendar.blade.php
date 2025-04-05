@@ -24,11 +24,3 @@
     @endif
 </div>
 
-@push('style')
-<style>
-</style>
-@endpush
-
-@push('scripts')
-<script>
-@endpush
