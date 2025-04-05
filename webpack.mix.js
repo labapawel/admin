@@ -7,7 +7,7 @@ mix.webpackConfig({
         children: true,
     },
 })
-
+ 
 
 mix.sass('resources/assets/scss/app.scss', 'css/admin-app.css')
   .js('resources/assets/js_owl/vue_init.js', 'js/vue.js')
