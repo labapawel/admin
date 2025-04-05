@@ -32,7 +32,6 @@
     "magnific-popup": "^1.1.0",
     "moment": "^2.29.4",
     "nestable2": "^1.6.0",
-    "node-sass": "^7.0.3",
     "noty": "^3.2.0-beta",
     "popper": "^1.0.1",
     "postcss-loader": "^7.0.0",
@@ -52,7 +51,7 @@
     "cross-env": "^7.0.3",
     "laravel-mix": "^6.0.43",
     "resolve-url-loader": "^5.0.0",
-    "sass": "^1.52.1",
+    "sass": "^1.86.3",
     "sass-loader": "^13.0.0",
     "vue-template-compiler": "^2.6.14"
   }

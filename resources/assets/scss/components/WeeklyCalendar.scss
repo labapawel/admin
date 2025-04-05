@@ -1,0 +1,89 @@
+.weekly-calendar-container {
+    margin-top: 10px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 0.15rem 1.75rem rgba(58, 59, 69, 0.15);
+    overflow: auto;
+}
+.weekly-calendar {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr);
+    border-collapse: collapse;
+    border-radius: 4px;
+    min-width: 800px;
+}
+.weekly-calendar .countHours {
+    font-weight: normal;
+}
+.weekly-calendar-header {
+    padding: 5px 0;
+    text-align: center;
+    font-weight: 600;
+    background-color: #343a40;
+    color: white;
+    border: 1px solid #e3e6f0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: 45px;
+    line-height: 30px;
+    box-sizing: border-box;
+}
+.weekly-calendar-time {
+    padding: 0;
+    text-align: center;
+    font-weight: 600;
+    background-color: #f8f9fc;
+    border: 1px solid #e3e6f0;
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    color: #5a5c69;
+    height: 30px;
+    line-height: 30px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.weekly-calendar-time.selected {
+    background-color: #5a5c69;
+    color: white;
+}
+.weekly-calendar-cell {
+    border: 1px solid #e3e6f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    user-select: none;
+    height: 30px;
+    padding: 0;
+    box-sizing: border-box;
+}
+.weekly-calendar-cell:hover {
+    background-color: #eaecf4;
+}
+.weekly-calendar-cell.selected {
+    background-color: #5a5c69;
+    color: white;
+}
+.weekly-calendar-legend {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 12px;
+    background-color: #f8f9fc;
+    border-top: 1px solid #e3e6f0;
+    color: #5a5c69;
+}
+.weekly-calendar-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.weekly-calendar-legend-color {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #e3e6f0;
+}
+.weekly-calendar-selected-example {
+    background-color: #5a5c69;
+}
