@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Form\Element;
+namespace SleepingOwl\Admin\Form\Element;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
