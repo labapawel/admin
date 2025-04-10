@@ -91,7 +91,7 @@ class DateRange extends NamedFormElement
                 'helpText' => $this->getHelpText(),
                 'attributes' => $this->getHtmlAttributes(),
                 'options' => $data['options'] ?? [],
-                'errors' => app('errors')
+                // Nie używamy app('errors'), zamiast tego polegamy na zmiennej $errors dostępnej w widoku
             ], $data)
         );
     }

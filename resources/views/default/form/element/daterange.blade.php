@@ -1,7 +1,6 @@
 @php
     // Upewnij się, że wszystkie zmienne są zdefiniowane i mają odpowiedni typ
     $attributes = isset($attributes) && is_array($attributes) ? $attributes : [];
-    $errors = isset($errors) ? $errors : app('errors');
     $name = isset($name) ? $name : '';
     $label = isset($label) ? $label : '';
     $required = isset($required) ? $required : false;
@@ -11,7 +10,8 @@
     // Dodaj klasę do atrybutów
     $attributes['class'] = isset($attributes['class']) ? $attributes['class'] . ' form-control daterange-input' : 'form-control daterange-input';
     
-    if ($errors->has($name)) {
+    // Sprawdź czy $errors istnieje (Laravel zawsze przekazuje to do widoków)
+    if (isset($errors) && $errors->has($name)) {
         $attributes['class'] .= ' is-invalid';
     }
     
@@ -50,15 +50,18 @@
     </div>
 </div>
 
-@section('scripts')
-@parent
+@push('scripts')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css"/>
 <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('{{ $id }}');
-    if (!input) return;
+    const inputId = '{{ $id }}';
+    const input = document.getElementById(inputId);
+    if (!input) {
+        console.error('DateRange: Element not found with ID:', inputId);
+        return;
+    }
     
     let options = {};
     try {
@@ -125,13 +128,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Inicjalizacja Litepicker
-    const picker = new Litepicker(litepickerConfig);
+    try {
+        const picker = new Litepicker(litepickerConfig);
+        console.log('DateRange: Litepicker initialized for', inputId);
+    } catch (e) {
+        console.error('Error initializing Litepicker:', e);
+    }
 });
 </script>
+@endpush
 
+@push('styles')
 <style>
     .litepicker .day-item.weekend-day {
         background-color: rgba(220, 220, 220, 0.3);
     }
 </style>
-@endsection
+@endpush
