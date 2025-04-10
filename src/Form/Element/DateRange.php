@@ -71,9 +71,30 @@ class DateRange extends NamedFormElement
     ];
     
     /**
-     * @var string|null
+     * Render the element.
+     *
+     * @return \Illuminate\View\View
      */
-    protected $value = null;
+    public function render()
+    {
+        $data = $this->toArray();
+        
+        // Upewnij się, że wszystkie wymagane zmienne są dostępne dla widoku
+        return app('sleeping_owl.template')->view(
+            $this->getView(), 
+            array_merge([
+                'id' => $this->getName(),
+                'name' => $this->getName(),
+                'value' => $this->getValue(),
+                'label' => $this->getLabel(),
+                'required' => $this->isRequired(),
+                'helpText' => $this->getHelpText(),
+                'attributes' => $this->getHtmlAttributes(),
+                'options' => $data['options'] ?? [],
+                'errors' => app('errors')
+            ], $data)
+        );
+    }
 
     /**
      * @return string
@@ -400,11 +421,8 @@ class DateRange extends NamedFormElement
         
         $this->setView('form.element.daterange');
         
-        // Dodaj niezbędne assety
-        $this->package(['litepicker' => [
-            'assets/js/litepicker.js',
-            'assets/css/litepicker.css',
-        ]]);
+        // W SleepingOwl Admin nie ma metody package(), więc usuwamy to
+        // Zasoby są ładowane bezpośrednio w widoku
     }
     
     /**
@@ -427,25 +445,71 @@ class DateRange extends NamedFormElement
     }
     
     /**
-     * Get element value.
-     *
-     * @return mixed
+     * @var string|null
      */
-    public function getValue()
+    protected $value = null;
+    
+    /**
+     * @var string|null
+     */
+    protected $helpText = null;
+    
+    /**
+     * @var bool
+     */
+    protected $required = false;
+
+    /**
+     * Get element's label.
+     *
+     * @return string
+     */
+    public function getLabel()
     {
-        return parent::getValue() ?: $this->value;
+        return $this->label ?? '';
+    }
+
+    /**
+     * Get element's help text.
+     *
+     * @return string
+     */
+    public function getHelpText()
+    {
+        return $this->helpText ?? '';
+    }
+
+    /**
+     * Set help text.
+     *
+     * @param string $helpText
+     * @return $this
+     */
+    public function setHelpText($helpText)
+    {
+        $this->helpText = $helpText;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRequired()
+    {
+        return (bool) $this->required;
     }
     
     /**
-     * Set element value.
+     * Set required.
      *
-     * @param mixed $value
+     * @param bool $required
      * @return $this
      */
-    public function setValue($value)
+    public function required($required = true)
     {
-        $this->value = $value;
-        
-        return parent::setValue($value);
+        $this->required = (bool) $required;
+
+        return $this;
     }
 }

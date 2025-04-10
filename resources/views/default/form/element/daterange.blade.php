@@ -19,25 +19,32 @@
     $id = str_replace('.', '-', $name);
 @endphp
 
-<div class="form-group {{ $errors->has($name) ? 'has-error' : '' }}">
+<div class="form-group {{ isset($errors) && $errors->has($name) ? 'has-error' : '' }}">
     <label for="{{ $id }}" class="control-label">
         {!! $label !!}
 
-        @if($required)
+        @if(isset($required) && $required)
             <span class="form-element-required">*</span>
         @endif
     </label>
 
     <div>
-        <input {!! $attributes !!} id="{{ $id }}" name="{{ $name }}" data-datepicker-options="{{ json_encode($options ?? []) }}" />
+        <input 
+            @foreach($attributes as $attr => $value)
+                {{ $attr }}="{{ $value }}"
+            @endforeach
+            id="{{ $id }}" 
+            name="{{ $name }}" 
+            data-datepicker-options="{{ json_encode($options ?? []) }}" 
+        />
 
-        @if($errors->has($name))
+        @if(isset($errors) && $errors->has($name))
             <span class="invalid-feedback">
                 <strong>{{ $errors->first($name) }}</strong>
             </span>
         @endif
 
-        @if($helpText)
+        @if(isset($helpText) && $helpText)
             <small class="form-text text-muted">{!! $helpText !!}</small>
         @endif
     </div>
@@ -49,8 +56,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('{{ $id }}');
-    if (!input) return;
+    const inputId = '{{ $id }}';
+    const input = document.getElementById(inputId);
+    if (!input) {
+        console.error('DateRange: Element not found with ID:', inputId);
+        return;
+    }
     
     let options = {};
     try {
@@ -117,10 +128,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Inicjalizacja Litepicker
-    const picker = new Litepicker(litepickerConfig);
+    try {
+        const picker = new Litepicker(litepickerConfig);
+        console.log('DateRange: Litepicker initialized for', inputId);
+    } catch (e) {
+        console.error('Error initializing Litepicker:', e);
+    }
 });
 </script>
+@endpush
 
+@push('styles')
 <style>
     .litepicker .day-item.weekend-day {
         background-color: rgba(220, 220, 220, 0.3);
