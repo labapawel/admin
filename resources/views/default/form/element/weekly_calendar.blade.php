@@ -27,7 +27,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
     const calendarId = "{{ $id }}";
-    const calendarContainer = document.getElementById(calendarId);
+    const calendarContainer = document.getElementById('calendar-container-'calendarId);
     const calendarInput = document.getElementById(calendarId);
     
     const startHour = parseInt(calendarInput.getAttribute('data-start-hour') || 7);
