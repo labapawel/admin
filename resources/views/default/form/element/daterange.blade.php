@@ -1,6 +1,21 @@
 @php
-    $attributes = $attributes ?? [];
-    $attributes['class'] = 'form-control daterange-input ' . ($errors->has($name) ? 'is-invalid' : '');
+    // Upewnij się, że wszystkie zmienne są zdefiniowane i mają odpowiedni typ
+    $attributes = isset($attributes) && is_array($attributes) ? $attributes : [];
+    $errors = isset($errors) ? $errors : app('errors');
+    $name = isset($name) ? $name : '';
+    $label = isset($label) ? $label : '';
+    $required = isset($required) ? $required : false;
+    $helpText = isset($helpText) ? $helpText : '';
+    $options = isset($options) && is_array($options) ? $options : [];
+    
+    // Dodaj klasę do atrybutów
+    $attributes['class'] = isset($attributes['class']) ? $attributes['class'] . ' form-control daterange-input' : 'form-control daterange-input';
+    
+    if ($errors->has($name)) {
+        $attributes['class'] .= ' is-invalid';
+    }
+    
+    // Wygeneruj ID
     $id = str_replace('.', '-', $name);
 @endphp
 
@@ -14,7 +29,7 @@
     </label>
 
     <div>
-        <input {!! $attributes !!} id="{{ $id }}" name="{{ $name }}" data-datepicker-options="{{ json_encode($options) }}" />
+        <input {!! $attributes !!} id="{{ $id }}" name="{{ $name }}" data-datepicker-options="{{ json_encode($options ?? []) }}" />
 
         @if($errors->has($name))
             <span class="invalid-feedback">
@@ -37,26 +52,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const input = document.getElementById('{{ $id }}');
     if (!input) return;
     
-    const options = JSON.parse(input.dataset.datepickerOptions || '{}');
+    let options = {};
+    try {
+        options = JSON.parse(input.dataset.datepickerOptions || '{}');
+    } catch (e) {
+        console.error('Error parsing datepicker options:', e);
+        options = {};
+    }
     
     // Konfiguracja Litepicker
     const litepickerConfig = {
         element: input,
         singleMode: false,
-        numberOfMonths: options.numberOfMonths || 2,
-        numberOfColumns: options.numberOfColumns || 2,
-        format: options.format || 'DD.MM.YYYY',
-        tooltipText: options.tooltipText || {
+        numberOfMonths: (options && options.numberOfMonths) || 2,
+        numberOfColumns: (options && options.numberOfColumns) || 2,
+        format: (options && options.format) || 'DD.MM.YYYY',
+        tooltipText: (options && options.tooltipText) || {
             one: 'dzień',
             other: 'dni'
         },
-        lang: options.locale || 'pl-PL',
-        autoApply: options.autoApply !== undefined ? options.autoApply : true,
-        showTooltip: options.showTooltip !== undefined ? options.showTooltip : true
+        lang: (options && options.locale) || 'pl-PL',
+        autoApply: (options && options.autoApply !== undefined) ? options.autoApply : true,
+        showTooltip: (options && options.showTooltip !== undefined) ? options.showTooltip : true
     };
 
     // Dodaj minimalną datę, jeśli jest ustawiona
-    if (options.minDate) {
+    if (options && options.minDate) {
         if (options.minDate === 'today') {
             litepickerConfig.minDate = new Date();
         } else {
@@ -65,17 +86,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Dodaj maksymalną datę, jeśli jest ustawiona
-    if (options.maxDate) {
+    if (options && options.maxDate) {
         litepickerConfig.maxDate = options.maxDate;
     }
 
     // Zablokowane dni
-    if (options.lockedDays && options.lockedDays.length) {
+    if (options && options.lockedDays && Array.isArray(options.lockedDays) && options.lockedDays.length) {
         litepickerConfig.lockDays = options.lockedDays;
     }
 
     // Oznaczanie weekendów
-    if (!options.highlightWeekends) {
+    if (options && options.highlightWeekends === false) {
         litepickerConfig.lockDaysFilter = (date) => {
             const day = date.getDay();
             return day === 0 || day === 6; // 0 = Niedziela, 6 = Sobota

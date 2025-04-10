@@ -69,6 +69,11 @@ class DateRange extends NamedFormElement
         'one' => 'dzień',
         'other' => 'dni',
     ];
+    
+    /**
+     * @var string|null
+     */
+    protected $value = null;
 
     /**
      * @return string
@@ -345,18 +350,102 @@ class DateRange extends NamedFormElement
     {
         $array = parent::toArray();
 
-        $array['format'] = $this->getFormat();
-        $array['numberOfMonths'] = $this->getNumberOfMonths();
-        $array['numberOfColumns'] = $this->getNumberOfColumns();
-        $array['minDate'] = $this->getMinDate();
-        $array['maxDate'] = $this->getMaxDate();
-        $array['lockedDays'] = $this->getLockedDays();
-        $array['highlightWeekends'] = $this->isHighlightWeekends();
-        $array['locale'] = $this->getLocale();
-        $array['autoApply'] = $this->isAutoApply();
-        $array['showTooltip'] = $this->isShowTooltip();
-        $array['tooltipText'] = $this->getTooltipText();
+        // Upewnij się, że wszystkie niezbędne zmienne są zdefiniowane
+        $array['id'] = $this->getName();
+        $array['name'] = $this->getName();
+        $array['value'] = $this->getValue();
+        $array['label'] = $this->getLabel();
+        $array['required'] = $this->isRequired();
+        $array['helpText'] = $this->getHelpText();
+        $array['attributes'] = $this->getHtmlAttributes();
+
+        // Przygotuj opcje dla datepickera
+        $options = [
+            'format' => $this->getFormat(),
+            'numberOfMonths' => $this->getNumberOfMonths(),
+            'numberOfColumns' => $this->getNumberOfColumns(),
+            'highlightWeekends' => $this->isHighlightWeekends(),
+            'locale' => $this->getLocale(),
+            'autoApply' => $this->isAutoApply(),
+            'showTooltip' => $this->isShowTooltip(),
+            'tooltipText' => $this->getTooltipText()
+        ];
+
+        // Dodaj opcjonalne parametry tylko jeśli są ustawione
+        if ($this->getMinDate() !== null) {
+            $options['minDate'] = $this->getMinDate();
+        }
+        
+        if ($this->getMaxDate() !== null) {
+            $options['maxDate'] = $this->getMaxDate();
+        }
+        
+        if (!empty($this->getLockedDays())) {
+            $options['lockedDays'] = $this->getLockedDays();
+        }
+
+        $array['options'] = $options;
 
         return $array;
+    }
+    
+    /**
+     * Initialize the element.
+     *
+     * @return void
+     */
+    public function initialize()
+    {
+        parent::initialize();
+        
+        $this->setView('form.element.daterange');
+        
+        // Dodaj niezbędne assety
+        $this->package(['litepicker' => [
+            'assets/js/litepicker.js',
+            'assets/css/litepicker.css',
+        ]]);
+    }
+    
+    /**
+     * Prepare element options before rendering.
+     *
+     * @return void
+     */
+    public function prepareAttributes()
+    {
+        parent::prepareAttributes();
+        
+        $this->setHtmlAttributes([
+            'class' => 'form-control daterange-input',
+            'autocomplete' => 'off',
+        ]);
+        
+        if ($value = $this->getValue()) {
+            $this->setAttribute('value', $value);
+        }
+    }
+    
+    /**
+     * Get element value.
+     *
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return parent::getValue() ?: $this->value;
+    }
+    
+    /**
+     * Set element value.
+     *
+     * @param mixed $value
+     * @return $this
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+        
+        return parent::setValue($value);
     }
 }
