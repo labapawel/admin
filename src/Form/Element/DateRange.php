@@ -1,331 +1,362 @@
 <?php
 
-// UWAGA: Zmieniono namespace zgodnie z prośbą.
-// Pamiętaj, że umieszczanie tego pliku w katalogu vendor/sleepingowl
-// spowoduje jego usunięcie przy aktualizacji przez Composer!
-// Zalecany namespace to np. App\Admin\Form\Element
 namespace SleepingOwl\Admin\Form\Element;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
-use SleepingOwl\Admin\Contracts\Initializable;
-// UWAGA: Jeśli przenosisz plik, upewnij się, że fasada PackageManager jest dostępna.
-// Może być konieczne dodanie pełnego 'use' lub sprawdzenie aliasów w config/app.php
-use KodiCMS\Assets\Facades\PackageManager;
-use SleepingOwl\Admin\Form\Element\NamedFormElement;
-use Illuminate\Support\Facades\Log;
+use SleepingOwl\Admin\Form\FormElement;
 
-
-// Zakładamy, że klasa NamedFormElement jest dostępna w tym samym namespace
-// lub odpowiednie 'use' zostanie dodane, jeśli dziedziczy z innej ścieżki.
-
-class DateRange extends NamedFormElement implements Initializable
+class DateRange extends NamedFormElement
 {
     /**
-     * @var string Ścieżka do widoku Blade dla tego elementu
-     * UWAGA: Ścieżka widoku również może wymagać dostosowania, jeśli plik
-     * zostanie przeniesiony do vendor. Może być konieczne użycie
-     * pełnej ścieżki lub zarejestrowanie nowego namespace dla widoków.
-     * Bezpieczniej jest zostawić widok w resources/views.
+     * @var string
      */
-    protected $view = 'admin.form.element.daterange'; // Domyślna ścieżka - może wymagać zmiany!
-
-    protected $fromField;
-    protected $toField;
-    protected $minDate;
-    protected $maxDate;
-    protected $holidays = [];
-    protected $highlightWeekends = false;
-    protected $format = 'Y-m-d';
-    protected $databaseFormat = 'Y-m-d';
-    protected $separator = ' - ';
+    protected $view = 'form.element.daterange';
 
     /**
-     * @param string $fromPath Nazwa atrybutu modelu dla daty początkowej
-     * @param string $toPath   Nazwa atrybutu modelu dla daty końcowej
-     * @param string|null $label Etykieta pola formularza
+     * @var string
      */
-    public function __construct($fromPath, $toPath, $label = null)
+    protected $format = 'DD.MM.YYYY';
+
+    /**
+     * @var int
+     */
+    protected $numberOfMonths = 2;
+
+    /**
+     * @var int
+     */
+    protected $numberOfColumns = 2;
+
+    /**
+     * @var string|null
+     */
+    protected $minDate = null;
+
+    /**
+     * @var string|null
+     */
+    protected $maxDate = null;
+
+    /**
+     * @var array
+     */
+    protected $lockedDays = [];
+
+    /**
+     * @var bool
+     */
+    protected $highlightWeekends = true;
+
+    /**
+     * @var string
+     */
+    protected $locale = 'pl-PL';
+
+    /**
+     * @var bool
+     */
+    protected $autoApply = true;
+
+    /**
+     * @var bool
+     */
+    protected $showTooltip = true;
+
+    /**
+     * @var array
+     */
+    protected $tooltipText = [
+        'one' => 'dzień',
+        'other' => 'dni',
+    ];
+
+    /**
+     * @return string
+     */
+    public function getFormat()
     {
-        parent::__construct($fromPath, $label);
-        $this->fromField = $fromPath;
-        $this->toField = $toPath;
+        return $this->format;
     }
 
     /**
-     * Inicjalizacja elementu - rejestracja zasobów JS/CSS przy użyciu fasady PackageManager.
-     */
-    public function initialize()
-    {
-        $elementId = $this->getId();
-
-        try {
-            PackageManager::css('litepicker-css', 'https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css');
-            PackageManager::js('litepicker-js', 'https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js', []);
-            PackageManager::js('litepicker-init-'.$elementId, '')
-                          ->dependsOn(['litepicker-js'])
-                          ->inline($this->renderJs());
-
-        } catch (\Exception $e) {
-             Log::error("DateRange ({$this->getName()}): Failed to register assets using PackageManager facade. Error: " . $e->getMessage());
-        }
-    }
-
-
-    /**
-     * Ustaw minimalną możliwą do wybrania datę.
-     * @param string|Carbon|\DateTime $date
-     * @return $this
-     */
-    public function minDate($date): self
-    {
-        $this->minDate = $this->formatDateForJs($date);
-        return $this;
-    }
-
-    /**
-     * Ustaw maksymalną możliwą do wybrania datę.
-     * @param string|Carbon|\DateTime $date
-     * @return $this
-     */
-    public function maxDate($date): self
-    {
-        $this->maxDate = $this->formatDateForJs($date);
-        return $this;
-    }
-
-    /**
-     * Ustaw konkretne daty do podświetlenia (np. święta).
-     * @param array $dates
-     * @return $this
-     */
-    public function highlightHolidays(array $dates): self
-    {
-        $this->holidays = collect($dates)->map(function ($date) {
-            return $this->formatDateForJs($date);
-        })->filter()->unique()->values()->all();
-        return $this;
-    }
-
-    /**
-     * Włącz podświetlanie Sobót i Niedziel.
-     * @param bool $highlight
-     * @return $this
-     */
-    public function highlightWeekends(bool $highlight = true): self
-    {
-        $this->highlightWeekends = $highlight;
-        return $this;
-    }
-
-    /**
-     * Ustaw format daty używany do wyświetlania w inpucie i parsowania.
+     * Set date format.
+     *
      * @param string $format
      * @return $this
      */
-    public function format(string $format = 'Y-m-d'): self
+    public function setFormat($format)
     {
         $this->format = $format;
+
         return $this;
     }
 
     /**
-     * Ustaw separator używany przez Litepicker do łączenia dat w inpucie.
-     * @param string $separator
+     * @return int
+     */
+    public function getNumberOfMonths()
+    {
+        return $this->numberOfMonths;
+    }
+
+    /**
+     * Set number of months to display.
+     *
+     * @param int $numberOfMonths
      * @return $this
      */
-    public function separator(string $separator): self
+    public function setNumberOfMonths($numberOfMonths)
     {
-         $this->separator = $separator;
-         return $this;
+        $this->numberOfMonths = (int) $numberOfMonths;
+
+        return $this;
     }
 
     /**
-     * Pobierz połączoną wartość z dwóch pól modelu do wyświetlenia w inpucie.
+     * @return int
+     */
+    public function getNumberOfColumns()
+    {
+        return $this->numberOfColumns;
+    }
+
+    /**
+     * Set number of columns.
+     *
+     * @param int $numberOfColumns
+     * @return $this
+     */
+    public function setNumberOfColumns($numberOfColumns)
+    {
+        $this->numberOfColumns = (int) $numberOfColumns;
+
+        return $this;
+    }
+
+    /**
      * @return string|null
      */
-    public function getValueFromModel()
+    public function getMinDate()
     {
-        $model = $this->getModel();
-        $fromValue = $model->getAttribute($this->fromField);
-        $toValue = $model->getAttribute($this->toField);
-
-        try {
-            $from = $fromValue ? Carbon::parse($fromValue)->format($this->format) : null;
-            $to = $toValue ? Carbon::parse($toValue)->format($this->format) : null;
-
-            if ($from && $to) {
-                return $from . $this->separator . $to;
-            } elseif ($from) {
-                 return $from;
-            }
-        } catch (\Exception $e) {
-            Log::error("DateRange ({$this->getName()}): Error Parsing Model Value. From: [{$fromValue}], To: [{$toValue}] - " . $e->getMessage());
-            return null;
-        }
-        return null;
+        return $this->minDate;
     }
 
     /**
-     * Ustawia wartości w modelu na podstawie połączonego stringu z inputa.
-     * @param Model $model
-     * @param mixed $value
+     * Set minimum date.
+     *
+     * @param string|Carbon $minDate
+     * @return $this
      */
-    public function setModelValue(Model $model, $value)
+    public function setMinDate($minDate)
     {
-        $fromValue = null;
-        $toValue = null;
-
-        if (is_string($value) && !empty($value) && strpos($value, $this->separator) !== false) {
-            list($fromStr, $toStr) = array_map('trim', explode($this->separator, $value, 2));
-            try {
-                $fromValue = Carbon::createFromFormat($this->format, $fromStr)->format($this->databaseFormat);
-                $toValue = Carbon::createFromFormat($this->format, $toStr)->format($this->databaseFormat);
-            } catch (\Exception $e) {
-                 Log::error("DateRange ({$this->getName()}): Error Parsing Submitted Range Value: '{$value}' - " . $e->getMessage());
-                 $fromValue = null;
-                 $toValue = null;
-            }
-        } elseif (is_string($value) && !empty($value)) {
-            Log::warning("DateRange ({$this->getName()}): Received single date value or invalid format: '{$value}'. Clearing range.");
-            $fromValue = null;
-            $toValue = null;
-        } else {
-             $fromValue = null;
-             $toValue = null;
+        if ($minDate instanceof Carbon) {
+            $minDate = $minDate->format('Y-m-d');
         }
 
-        $model->setAttribute($this->fromField, $fromValue);
-        $model->setAttribute($this->toField, $toValue);
+        $this->minDate = $minDate;
+
+        return $this;
     }
 
-
     /**
-     * Przygotuj dane do przekazania do widoku Blade.
-     * @return array
+     * Set current date as minimum date.
+     *
+     * @return $this
      */
-    public function toArray(): array
+    public function setTodayAsMinDate()
     {
-        $pickerOptions = $this->getPickerOptions();
-        $jsConfig = [
-            'highlightWeekends' => $this->highlightWeekends,
-            'holidays' => $this->holidays,
-        ];
-        $parentData = parent::toArray();
-        return $parentData + [
-            'id' => $this->getId(),
-            'value' => $this->getValueFromModel() ?? $this->getDefaultValue(),
-            'readonly' => $this->isReadonly(),
-            'attributes' => $this->getAttributes(),
-            'picker_options' => $pickerOptions,
-            'input_name' => $this->getName(),
-            'config' => $jsConfig,
-        ];
+        $this->minDate = 'today';
+
+        return $this;
     }
 
     /**
-     * Generuje podstawową tablicę opcji konfiguracyjnych dla Litepickera w JS.
-     * @return array
-     */
-    protected function getPickerOptions(): array
-    {
-        $options = [
-            'singleMode' => false,
-            'allowRepick' => true,
-            'numberOfMonths' => 2,
-            'numberOfColumns' => 2,
-            'format' => 'YYYY-MM-DD', // Format Litepickera
-            'separator' => $this->separator,
-            'minDate' => $this->minDate,
-            'maxDate' => $this->maxDate,
-            'showTooltip' => true,
-            'lang' => 'pl-PL',
-             'buttonText' => [
-                 'apply' => 'Zastosuj',
-                 'cancel' => 'Anuluj',
-             ],
-             'autoApply' => true,
-             'showWeekNumbers' => false,
-             'startOfWeek' => 1,
-        ];
-        return array_filter($options, fn ($value) => !is_null($value));
-    }
-
-    /**
-    * Generuje kod JavaScript do inicjalizacji instancji Litepicker.
-    * @return string
-    */
-    protected function renderJs(): string
-    {
-        $elementId = $this->getId();
-        $options = $this->getPickerOptions();
-        $config = [
-             'highlightWeekends' => $this->highlightWeekends,
-             'holidays' => $this->holidays,
-         ];
-        $optionsJson = json_encode($options, JSON_UNESCAPED_SLASHES | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT);
-        $configJson = json_encode($config, JSON_UNESCAPED_SLASHES | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRETTY_PRINT);
-
-        return <<<JS
-(function() {
-    function initPicker_{$elementId}() {
-        const element = document.getElementById('{$elementId}');
-        if (!element || element.litepickerInstance) return;
-
-        try {
-            let options = JSON.parse('{$optionsJson}');
-            const config = JSON.parse('{$configJson}');
-            options.element = element;
-
-            if (config.highlightWeekends || (config.holidays && config.holidays.length > 0)) {
-                options.highlightedDays = function(date) {
-                    if (!date || !(date instanceof Date)) return false;
-                    let isHighlighted = false;
-                    const day = date.getDay();
-                    if (config.highlightWeekends && (day === 0 || day === 6)) isHighlighted = true;
-                    if (!isHighlighted && config.holidays && config.holidays.length > 0) {
-                        try {
-                            const year = date.getFullYear();
-                            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                            const dayOfMonth = date.getDate().toString().padStart(2, '0');
-                            const dateString = `${year}-${month}-${dayOfMonth}`;
-                            if (config.holidays.includes(dateString)) isHighlighted = true;
-                        } catch (e) { console.error("DateRange ({$elementId}): Error formatting date for holiday check:", date, e); }
-                    }
-                    return isHighlighted;
-                };
-            }
-
-            const picker = new Litepicker(options);
-            element.litepickerInstance = picker;
-
-        } catch (e) { console.error("DateRange ({$elementId}): Failed to initialize Litepicker.", e, JSON.parse('{$optionsJson}')); }
-    }
-
-    if (document.readyState === 'interactive' || document.readyState === 'complete') {
-        initPicker_{$elementId}();
-    } else {
-        document.addEventListener('DOMContentLoaded', initPicker_{$elementId});
-    }
-})();
-JS;
-    }
-
-
-    /**
-     * Formatuje datę do stringa 'Y-m-d' dla JS.
-     * @param mixed $date
      * @return string|null
      */
-    protected function formatDateForJs($date): ?string
+    public function getMaxDate()
     {
-        if ($date instanceof Carbon) return $date->format('Y-m-d');
-        if ($date instanceof \DateTimeInterface) return $date->format('Y-m-d');
-        if (is_string($date) && !empty($date)) {
-            try { return Carbon::parse($date)->format('Y-m-d'); }
-            catch (\Exception $e) { Log::warning("DateRange ({$this->getName()}): Could not parse date string for JS options: '{$date}'"); return null; }
-        }
-        return null;
+        return $this->maxDate;
     }
-} // Koniec klasy DateRange
+
+    /**
+     * Set maximum date.
+     *
+     * @param string|Carbon $maxDate
+     * @return $this
+     */
+    public function setMaxDate($maxDate)
+    {
+        if ($maxDate instanceof Carbon) {
+            $maxDate = $maxDate->format('Y-m-d');
+        }
+
+        $this->maxDate = $maxDate;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLockedDays()
+    {
+        return $this->lockedDays;
+    }
+
+    /**
+     * Set locked days.
+     *
+     * @param array $lockedDays
+     * @return $this
+     */
+    public function setLockedDays(array $lockedDays)
+    {
+        $this->lockedDays = $lockedDays;
+
+        return $this;
+    }
+
+    /**
+     * Lock specific dates.
+     *
+     * @param string|Carbon $date
+     * @return $this
+     */
+    public function lockDay($date)
+    {
+        if ($date instanceof Carbon) {
+            $date = $date->format('Y-m-d');
+        }
+
+        $this->lockedDays[] = $date;
+
+        return $this;
+    }
+
+    /**
+     * Lock weekends (Saturday and Sunday).
+     *
+     * @param bool $lock
+     * @return $this
+     */
+    public function lockWeekends($lock = true)
+    {
+        $this->highlightWeekends = !$lock;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHighlightWeekends()
+    {
+        return $this->highlightWeekends;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    /**
+     * Set locale.
+     *
+     * @param string $locale
+     * @return $this
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAutoApply()
+    {
+        return $this->autoApply;
+    }
+
+    /**
+     * Set auto apply option.
+     *
+     * @param bool $autoApply
+     * @return $this
+     */
+    public function setAutoApply($autoApply)
+    {
+        $this->autoApply = (bool) $autoApply;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowTooltip()
+    {
+        return $this->showTooltip;
+    }
+
+    /**
+     * Set show tooltip option.
+     *
+     * @param bool $showTooltip
+     * @return $this
+     */
+    public function setShowTooltip($showTooltip)
+    {
+        $this->showTooltip = (bool) $showTooltip;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTooltipText()
+    {
+        return $this->tooltipText;
+    }
+
+    /**
+     * Set tooltip text.
+     *
+     * @param array $tooltipText
+     * @return $this
+     */
+    public function setTooltipText(array $tooltipText)
+    {
+        $this->tooltipText = $tooltipText;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        $array = parent::toArray();
+
+        $array['format'] = $this->getFormat();
+        $array['numberOfMonths'] = $this->getNumberOfMonths();
+        $array['numberOfColumns'] = $this->getNumberOfColumns();
+        $array['minDate'] = $this->getMinDate();
+        $array['maxDate'] = $this->getMaxDate();
+        $array['lockedDays'] = $this->getLockedDays();
+        $array['highlightWeekends'] = $this->isHighlightWeekends();
+        $array['locale'] = $this->getLocale();
+        $array['autoApply'] = $this->isAutoApply();
+        $array['showTooltip'] = $this->isShowTooltip();
+        $array['tooltipText'] = $this->getTooltipText();
+
+        return $array;
+    }
+}
