@@ -50,18 +50,15 @@
     </div>
 </div>
 
-@push('scripts')
+@section('scripts')
+@parent
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css"/>
 <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const inputId = '{{ $id }}';
-    const input = document.getElementById(inputId);
-    if (!input) {
-        console.error('DateRange: Element not found with ID:', inputId);
-        return;
-    }
+    const input = document.getElementById('{{ $id }}');
+    if (!input) return;
     
     let options = {};
     try {
@@ -128,20 +125,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Inicjalizacja Litepicker
-    try {
-        const picker = new Litepicker(litepickerConfig);
-        console.log('DateRange: Litepicker initialized for', inputId);
-    } catch (e) {
-        console.error('Error initializing Litepicker:', e);
-    }
+    const picker = new Litepicker(litepickerConfig);
 });
 </script>
-@endpush
 
-@push('styles')
 <style>
     .litepicker .day-item.weekend-day {
         background-color: rgba(220, 220, 220, 0.3);
     }
 </style>
-@endpush
+@endsection
