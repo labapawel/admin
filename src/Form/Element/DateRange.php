@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request; // Chociaż nie używamy bezpośrednio w save, może być potrzebne w przyszłości
 use SleepingOwl\Admin\Contracts\Initializable; // Ten interfejs powinien nadal istnieć
-use SleepingOwl\Admin\Facades\AdminTemplate; // <--- Dodano fasadę AdminTemplate
+// use SleepingOwl\Admin\Facades\AdminTemplate; // <--- Dodano fasadę AdminTemplate
 use SleepingOwl\Admin\Form\Element\NamedFormElement;
 use Illuminate\Support\Facades\Log; // Do logowania błędów
 
