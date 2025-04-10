@@ -53,18 +53,18 @@ class DateRange extends NamedFormElement implements Initializable
 
         try {
             // Użyj fasady AdminTemplate do dodania stylów i skryptów
-            AdminTemplate::addStyle('litepicker-css', 'https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css');
+            \AdminTemplate::addStyle('litepicker-css', 'https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css');
 
             // Dodaj główny skrypt Litepicker, zadeklaruj zależność (jeśli system jej wymaga)
             // Ostatni argument 'true' zwykle oznacza ładowanie w stopce
             // Zależność 'admin-default' może być specyficzna dla starszych wersji, nowsze mogą jej nie wymagać яввно
-            AdminTemplate::addScript('litepicker-js', 'https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js', ['admin-default'], true);
+            \AdminTemplate::addScript('litepicker-js', 'https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js', ['admin-default'], true);
 
             // Dodaj nasz niestandardowy skrypt inicjalizujący jako blok kodu JS
             // Używamy addScriptBody dla kodu inline, a nie URL
             // Upewnij się, że klucz 'litepicker-init-'.$elementId jest unikalny
             // Podaj zależność 'litepicker-js', aby upewnić się, że biblioteka jest załadowana wcześniej
-            AdminTemplate::addScriptBody('litepicker-init-'.$elementId, $this->renderJs(), ['litepicker-js']);
+            \AdminTemplate::addScriptBody('litepicker-init-'.$elementId, $this->renderJs(), ['litepicker-js']);
 
         } catch (\Exception $e) {
              // Złap potencjalne błędy, jeśli fasada lub metody nie istnieją w danej wersji SO
