@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wybór Zakresu Dat (3 Miesiące)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css"/>
+<style>
+  /* Dodatkowy CSS dla lepszego wyglądu (opcjonalnie) */
+  body {
+    font-family: sans-serif;
+    padding: 20px;
+  }
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 250px; /* Dostosuj szerokość */
+  }
+</style>
+</head>
+<body>
+
+  <label for="datepicker">Wybierz zakres dat:</label>
+  <input id="datepicker"/>
+
+<script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+
+<script>
+  // Pobierz dzisiejszą datę, aby ustawić ograniczenia
+  const dzisiaj = new Date();
+
+  // Inicjalizacja Litepicker
+  const picker = new Litepicker({
+    element: document.getElementById('datepicker'), // Podepnij do pola input
+    singleMode: false, // Ustaw na false dla wyboru zakresu dat
+    numberOfMonths: 3, // Wyświetlaj 3 miesiące obok siebie
+    numberOfColumns: 3, // Ułóż je w jednym rzędzie
+    format: 'DD.MM.YYYY', // Format wyświetlanej daty w inpucie
+    tooltipText: { // Opcjonalne polskie tłumaczenie etykiet
+        "one": "dzień",
+        "other": "dni"
+    },
+    lang: 'pl-PL', // Ustawienie języka polskiego (wymaga czasem dodatkowej konfiguracji lub importu lokalizacji)
+
+    // --- Ograniczenia dat ---
+    minDate: dzisiaj, // Nie można wybrać dat wcześniejszych niż dzisiejsza
+    // maxDate: '2025-12-31', // Przykładowa maksymalna data
+    // Można też użyć obiektu Date:
+    // maxDate: new Date(2025, 11, 31), // Pamiętaj, że miesiące są indeksowane od 0 (11 to grudzień)
+
+    // Możesz też bardziej zaawansowanie blokować daty, np. weekendy:
+    // lockDaysFilter: (date) => {
+    //   const day = date.getDay(); // 0 = Niedziela, 6 = Sobota
+    //   return [0, 6].includes(day);
+    // }
+
+    // Inne przydatne opcje:
+    // autoApply: true, // Automatycznie zamknij kalendarz po wyborze zakresu
+    // showTooltip: true, // Pokaż liczbę wybranych dni
+  });
+</script>
+
+</body>
+</html>
