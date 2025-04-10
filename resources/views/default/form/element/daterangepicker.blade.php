@@ -75,7 +75,6 @@
 <script>
     
 
-$(function() {
     // Inicjalizacja wszystkich kalendarzy na stronie
     $('.form-element-daterangepicker').each(function() {
         initDateRangePicker($(this));
@@ -304,7 +303,7 @@ $(function() {
             });
         }
     }
-});
+
 
 
 
